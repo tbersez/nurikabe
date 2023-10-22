@@ -23,16 +23,16 @@ board *initBoard(int n_rows, int n_cols)
         for (size_t j = 0; j < n_cols; j++) {
             emptyCell.row = i;
             emptyCell.col = j;
+            emptyCell.island = 0;
             pboard -> grid[i][j] = emptyCell;
 
         }
     }
     return pboard;
 }
-
-// ----------------------
-// --- FLOODING RULES ---
-// ----------------------
+// --------------------------
+// --- BOARD MANIPULATION ---
+// --------------------------
 
 bool isInBoard(board *pboard, int row, int col)
 {
@@ -51,6 +51,28 @@ cellType getStatus(board *pboard, int row, int col)
     cell c = pboard -> grid[row][col];
     return c.type;
 }
+
+// cellNode *getOrthogonalCells(board *pboard, int row, int col){
+//     assert(isInBoard(pboard, row, col));
+//     cellNode *list = initCellList(&((pboard -> grid[row][col])));
+//     // int cases[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+//     // int new_row, new_col;
+//     // for (int i = 0; i < 4; i++)
+//     //     {
+//     //         new_row = row + cases[i][0];
+//     //         new_col = col + cases[i][1];
+//     //         if (isInBoard(pboard, new_row, new_col))
+//     //         {
+//     //             /* code */
+//     //         }
+            
+//     //     }
+//     return list;
+// }
+
+// ----------------------
+// --- FLOODING RULES ---
+// ----------------------
 
 bool isPoolSafe(board *pboard, int row, int col)
 // Checks if flooding [row][col] creates a 2x2
@@ -158,6 +180,12 @@ void floodBoard(board *pboard)
     asignCell(pboard, seed_row, seed_col, WATER);
     fillEmptyCells(pboard);
 }
+
+// ---------------
+// --- ISLANDS ---
+// ---------------
+
+void markAsIsland(board *pboard, int row, int col, int islandId){}
 
 // ---------------
 // --- DISPLAY ---

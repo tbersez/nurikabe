@@ -1,5 +1,10 @@
 #include "cells.h"
 #include <stdio.h>
+#include <stdlib.h>
+
+// -------------
+// --- CELLS ---
+// -------------
 
 void printCell(cell *c)
 // Prints cell using terminal background color
@@ -16,4 +21,47 @@ void setCellStatus(cell *c, cellType type)
 // Sets cell type
 {
     c -> type = type;
+}
+
+// ------------------
+// --- CELL LISTS ---
+// ------------------
+
+cellList *initCellList()
+// Creates an empty cell list
+{
+    cellList *list;
+    list = (cellList*)malloc(sizeof(cellList));
+    list -> head = NULL;
+    return list;
+}
+
+void appendToCellList(cellList *list, cell *c)
+// Append cell node *c to cell list
+{
+    cellNode *new_node, *current;
+    new_node = (cellNode*)malloc(sizeof(cellNode));
+    new_node -> cell = c;
+    new_node -> next = NULL;
+    current = list -> head;
+    if ((list -> head) == NULL)
+    {
+       list -> head = new_node; 
+    } else {
+        while (current -> next != NULL) {
+            current = current -> next;
+        }
+        current -> next = new_node;
+    }
+}
+
+void printCellList(cellList *list){
+    cell *c;
+    cellNode *current = list -> head;
+   	while (current != NULL) {
+        c = current -> cell;
+        printf("[%d, %d]", c -> row, c -> col);
+        current = current -> next;
+    }
+    printf("\n");
 }

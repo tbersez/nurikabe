@@ -13,5 +13,9 @@ int main(){
     board *pboard = initBoard(ROWS, COLS);
     floodBoard(pboard);
     printBoard(pboard);
+    cellList *list = initCellList();
+    appendToCellList(list, &(pboard -> grid[0][0]));
+    appendToCellList(list, &(pboard -> grid[2][3]));
+    printCellList(list);
     return 0;
 }
