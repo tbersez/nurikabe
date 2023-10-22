@@ -8,4 +8,5 @@ typedef struct Board
 } board;
 
 board *initBoard(int rows, int cols);
+void floodBoard(board *pboard);
 void printBoard(board *board);

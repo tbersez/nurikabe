@@ -8,3 +8,4 @@ typedef struct Cell
 } cell;
 
 void printCell(cell *c);
+void setCellStatus(cell *c, cellType type);
