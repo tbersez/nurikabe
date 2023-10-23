@@ -55,7 +55,24 @@ void appendToCellList(cellList *list, cell *c)
     }
 }
 
-void printCellList(cellList *list){
+cell *popCellList(cellList *list)
+// Pops last cell from list
+{
+    cell *pcell;
+    cellNode *temp;
+    if ((list -> head) == NULL)
+    {
+       return NULL;
+    }
+    temp = list -> head;
+    list -> head = temp -> next;
+    pcell = temp -> cell;
+    return pcell;
+}
+
+void printCellList(cellList *list)
+// Prints cellList
+{
     cell *c;
     cellNode *current = list -> head;
    	while (current != NULL) {

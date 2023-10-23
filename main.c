@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <assert.h>
-#include "board.h"
+#include "generator.h"
 
 // --- MAIN ---
 int main(){
@@ -14,8 +14,14 @@ int main(){
     floodBoard(pboard);
     printBoard(pboard);
     cellList *list = initCellList();
-    appendToCellList(list, &(pboard -> grid[0][0]));
-    appendToCellList(list, &(pboard -> grid[2][3]));
+    cell *pcell;
+    list = getOrthogonalCells(pboard, 0, 0);
     printCellList(list);
+    pcell = popCellList(list);
+    while (pcell != NULL)
+    {
+        printCellList(list);
+        pcell = popCellList(list);
+    }
     return 0;
 }

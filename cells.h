@@ -24,3 +24,4 @@ void setCellStatus(cell *c, cellType type);
 cellList *initCellList();
 void printCellList(cellList *list);
 void appendToCellList(cellList *list, cell *c);
+cell *popCellList(cellList *list);

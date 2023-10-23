@@ -52,140 +52,23 @@ cellType getStatus(board *pboard, int row, int col)
     return c.type;
 }
 
-// cellNode *getOrthogonalCells(board *pboard, int row, int col){
-//     assert(isInBoard(pboard, row, col));
-//     cellNode *list = initCellList(&((pboard -> grid[row][col])));
-//     // int cases[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-//     // int new_row, new_col;
-//     // for (int i = 0; i < 4; i++)
-//     //     {
-//     //         new_row = row + cases[i][0];
-//     //         new_col = col + cases[i][1];
-//     //         if (isInBoard(pboard, new_row, new_col))
-//     //         {
-//     //             /* code */
-//     //         }
+cellList *getOrthogonalCells(board *pboard, int row, int col){
+    assert(isInBoard(pboard, row, col));
+    cellList *list = initCellList();
+    int ort_row, ort_col;
+    int cases[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+    for (int i = 0; i < 4; i++)
+        {
+            ort_row = row + cases[i][0];
+            ort_col = col + cases[i][1];
+            if (isInBoard(pboard, ort_row, ort_col))
+            {
+                appendToCellList(list, &(pboard -> grid[ort_row][ort_col]));
+            }
             
-//     //     }
-//     return list;
-// }
-
-// ----------------------
-// --- FLOODING RULES ---
-// ----------------------
-
-bool isPoolSafe(board *pboard, int row, int col)
-// Checks if flooding [row][col] creates a 2x2
-// pool or not. There is 4 possible pools per cell.
-{
-    int n_rows = pboard -> rows;
-    int n_cols = pboard -> cols;
-    // Upper left pool
-    if (row != 0 && col != 0)
-    {
-        if (getStatus(pboard, row - 1, col - 1) == WATER && getStatus(pboard, row, col - 1) == WATER && getStatus(pboard, row - 1, col) == WATER)
-        {
-            return false;
         }
-    }
-    // Lower left pool
-    if (row != (n_rows - 1) && col != 0)
-    {
-        if (getStatus(pboard, row + 1, col - 1) == WATER && getStatus(pboard, row, col - 1) == WATER && getStatus(pboard, row + 1, col) == WATER)
-        {
-            return false;
-        }
-    }
-    // Upper right pool
-    if (row != 0 && col != (n_cols - 1))
-    {
-        if (getStatus(pboard, row - 1, col) == WATER && getStatus(pboard, row - 1, col + 1) == WATER && getStatus(pboard, row, col + 1) == WATER)
-        {
-            return false;
-        }
-    }
-    // Lower right pool
-    if (row != (n_rows - 1) && col != (n_cols - 1))
-    {
-        if (getStatus(pboard, row + 1, col) == WATER && getStatus(pboard, row, col + 1) == WATER && getStatus(pboard, row + 1, col + 1) == WATER)
-        {
-            return false;
-        }
-    }
-    return true;
+    return list;
 }
-
-// --------------------------
-// --- FLOODING ALGORITHM ---
-// --------------------------
-
-cellType landOrWater()
-// Randomly pick between land and water
-{
-    int landLikelyhood = 33;
-    int cursor = rand() % 100;
-    if (cursor <= landLikelyhood)
-    {
-        return LAND;
-    }
-    return WATER;
-}
-
-void asignCell(board *pboard, int row, int col, cellType status)
-{
-    setCellStatus(&(pboard -> grid[row][col]), status);
-    if (status == WATER) {
-        int cases[4][2] = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
-        int new_row, new_col;
-        for (int i = 0; i < 4; i++)
-        {
-            new_row = row + cases[i][0];
-            new_col = col + cases[i][1];
-            if (isInBoard(pboard, new_row, new_col) && (getStatus(pboard, new_row, new_col) == EMPTY))
-            {
-                if (isPoolSafe(pboard, new_row, new_col) == false)
-                {
-                    setCellStatus(&(pboard -> grid[new_row][new_col]), LAND);
-                } else {
-                    asignCell(pboard, new_row, new_col, landOrWater());
-                }
-            }
-        }
-    }
-}
-
-void fillEmptyCells(board *pboard)
-// Turns empty cells into land
-{
-    cell *pcell;
-    int n_rows = pboard -> rows;
-    int n_cols = pboard -> cols;
-    for (size_t i = 0; i < n_rows; i++) { 
-        for (size_t j = 0; j < n_cols; j++) {
-            pcell = &(pboard -> grid[i][j]);
-            if (pcell -> type == EMPTY)
-            {
-                setCellStatus(pcell, LAND);
-            }
-        }
-    }
-}
-
-void floodBoard(board *pboard)
-// Creates the water area
-{   
-    int seed_row, seed_col;
-    seed_row = rand() % (pboard -> rows);
-    seed_col = rand() % (pboard -> cols);
-    asignCell(pboard, seed_row, seed_col, WATER);
-    fillEmptyCells(pboard);
-}
-
-// ---------------
-// --- ISLANDS ---
-// ---------------
-
-void markAsIsland(board *pboard, int row, int col, int islandId){}
 
 // ---------------
 // --- DISPLAY ---
