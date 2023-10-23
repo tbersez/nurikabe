@@ -13,15 +13,5 @@ int main(){
     board *pboard = initBoard(ROWS, COLS);
     floodBoard(pboard);
     printBoard(pboard);
-    cellList *list = initCellList();
-    cell *pcell;
-    list = getOrthogonalCells(pboard, 0, 0);
-    printCellList(list);
-    pcell = popCellList(list);
-    while (pcell != NULL)
-    {
-        printCellList(list);
-        pcell = popCellList(list);
-    }
     return 0;
 }

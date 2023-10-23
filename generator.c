@@ -1,5 +1,6 @@
 #include "generator.h"
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -108,6 +109,91 @@ void fillEmptyCells(board *pboard)
     }
 }
 
+// --------------- //
+// --- ISLANDS --- //
+// --------------- //
+
+void markIsland(board *pboard, int row, int col, int id)
+// Marks cells as island with id then recurse orthogonaly.
+{
+    cell *pc;
+    cellList *list = getOrthogonalCells(pboard, row, col);
+    pc = &(pboard -> grid[row][col]);
+    pc -> island = id;
+    pc = popCellList(list);
+    while (pc != NULL)
+    {
+        if ((pc -> type) == LAND && (pc -> island) == 0)
+        {
+            markIsland(pboard, pc -> row, pc -> col, id);
+        }
+        pc = popCellList(list);
+    }
+    
+}
+
+void markIslands(board *pboard)
+// Mark islands of the board.
+{
+    int nrow, ncol, id;
+    cell *pc;
+    nrow = pboard -> rows;
+    ncol = pboard -> cols;
+    id = 1;
+    for (size_t i = 0; i < nrow; i++)
+    {
+        for (size_t j = 0; j < ncol; j++)
+        {
+            pc = &(pboard -> grid[i][j]);
+            if ((pc -> island) == 0 && (pc -> type) == LAND)
+            {
+                markIsland(pboard, i, j, id);
+                id++;
+            }
+        }
+    }
+}
+
+int findLargestIslandID(board *pboard)
+// Finds the largest island of the board and
+// returns its id.
+{
+    cell *pc;
+    int nrow, ncol, idMax, *sizes;
+    nrow = pboard -> rows;
+    ncol = pboard -> cols;
+    // By safety, the sizes array size is set
+    // to the number of cells in the board.
+    sizes = malloc(((nrow * ncol)) * sizeof(int));
+    for (size_t i = 0; i < nrow; i++)
+    {
+        for (size_t j = 0; j < ncol; j++)
+        {
+            pc = &(pboard -> grid[i][j]);
+            if ((pc -> type) == LAND, (pc -> island) != 0)
+            {
+                sizes[pc -> island]++;
+            }
+            
+        }
+    }
+    idMax = 0;
+    for (size_t i = 1; i < (nrow * ncol); i++)
+    {
+        if (sizes[i] > sizes[idMax])
+        {
+            idMax = i;
+        }
+        
+    }
+    free(sizes);
+    return idMax;
+}
+
+// -----------------
+// --- GENERATOR ---
+// -----------------
+
 void floodBoard(board *pboard)
 // Creates the water area
 {   
@@ -116,4 +202,6 @@ void floodBoard(board *pboard)
     seed_col = rand() % (pboard -> cols);
     asignCell(pboard, seed_row, seed_col, WATER);
     fillEmptyCells(pboard);
+    markIslands(pboard);
+    printf("%d\n", findLargestIslandID(pboard));
 }

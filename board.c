@@ -77,6 +77,7 @@ cellList *getOrthogonalCells(board *pboard, int row, int col){
 void printBoard(board *pboard)
 // Prints board to terminal
 {
+    cell *pc;
     for (size_t i = 0; i < (pboard -> rows); i++) {
         for (size_t j = 0; j < (pboard -> cols); j++) {
             printCell(&(pboard -> grid[i][j]));
