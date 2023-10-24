@@ -23,7 +23,7 @@ board *initBoard(int n_rows, int n_cols)
         for (size_t j = 0; j < n_cols; j++) {
             emptyCell.row = i;
             emptyCell.col = j;
-            emptyCell.island = 0;
+            emptyCell.island = -1; // -1 stands for no island
             pboard -> grid[i][j] = emptyCell;
 
         }

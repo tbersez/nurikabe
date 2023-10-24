@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stddef.h>
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
 
 // ----------------------
 // --- FLOODING RULES ---
@@ -123,7 +124,7 @@ void markIsland(board *pboard, int row, int col, int id)
     pc = popCellList(list);
     while (pc != NULL)
     {
-        if ((pc -> type) == LAND && (pc -> island) == 0)
+        if ((pc -> type) == LAND && (pc -> island) == -1)
         {
             markIsland(pboard, pc -> row, pc -> col, id);
         }
@@ -139,13 +140,13 @@ void markIslands(board *pboard)
     cell *pc;
     nrow = pboard -> rows;
     ncol = pboard -> cols;
-    id = 1;
+    id = 0;
     for (size_t i = 0; i < nrow; i++)
     {
         for (size_t j = 0; j < ncol; j++)
         {
             pc = &(pboard -> grid[i][j]);
-            if ((pc -> island) == 0 && (pc -> type) == LAND)
+            if ((pc -> island) == -1 && (pc -> type) == LAND)
             {
                 markIsland(pboard, i, j, id);
                 id++;
@@ -154,54 +155,172 @@ void markIslands(board *pboard)
     }
 }
 
-int findLargestIslandID(board *pboard)
-// Finds the largest island of the board and
-// returns its id.
+void unmarkIslands(board *pboard)
+// Resets island markings
 {
+    int nrow, ncol;
     cell *pc;
-    int nrow, ncol, idMax, *sizes;
     nrow = pboard -> rows;
     ncol = pboard -> cols;
-    // By safety, the sizes array size is set
-    // to the number of cells in the board.
-    sizes = malloc(((nrow * ncol)) * sizeof(int));
     for (size_t i = 0; i < nrow; i++)
     {
         for (size_t j = 0; j < ncol; j++)
         {
             pc = &(pboard -> grid[i][j]);
-            if ((pc -> type) == LAND, (pc -> island) != 0)
+            pc -> island = -1;
+        }
+    }
+}
+
+int countIslands(board *pboard)
+// Counts the number of islands on the board
+{
+    cell *pc;
+    int nrow, ncol, maxIslandId;
+    nrow = pboard -> rows;
+    ncol = pboard -> cols;
+    maxIslandId = 0;
+    for (size_t i = 0; i < nrow; i++)
+    {
+        for (size_t j = 0; j < ncol; j++)
+        {
+            pc = &(pboard -> grid[i][j]);
+            if ((pc -> island) > maxIslandId)
+            {
+                maxIslandId = (pc -> island);
+            }
+        }
+    }
+    return maxIslandId + 1;
+}
+
+int *getIslandSizes(board *pboard, int nIsland)
+// Return an array detailing island sizes:
+// ["island Id"] = "island size"
+{
+    cell *pc;
+    int nrow, ncol, *sizes;
+    nrow = pboard -> rows;
+    ncol = pboard -> cols;
+    sizes = malloc(nIsland * sizeof(int));
+    for (size_t i = 0; i < nrow; i++)
+    {
+        for (size_t j = 0; j < ncol; j++)
+        {
+            pc = &(pboard -> grid[i][j]);
+            if ((pc -> type) == LAND, (pc -> island) != -1)
             {
                 sizes[pc -> island]++;
             }
             
         }
     }
-    idMax = 0;
-    for (size_t i = 1; i < (nrow * ncol); i++)
-    {
-        if (sizes[i] > sizes[idMax])
-        {
-            idMax = i;
-        }
-        
-    }
-    free(sizes);
-    return idMax;
+    return sizes;
 }
 
+void clearIsland(board *pboard, int islandId)
+// Resets type and island attributes of the
+// given island.
+{
+    cell *pc;
+    int nrow, ncol;
+    nrow = pboard -> rows;
+    ncol = pboard -> cols;
+    for (int i = 0; i < nrow; i++)
+    {
+        for (int j = 0; j < ncol; j++)
+        {
+            pc = &(pboard -> grid[i][j]);
+            if ((pc -> island) == islandId)
+            {
+                pc -> island = -1;
+                pc -> type = EMPTY;
+            }
+            
+        }
+    }
+
+}
 // -----------------
 // --- GENERATOR ---
 // -----------------
 
 void floodBoard(board *pboard)
-// Creates the water area
+// Board generator
 {   
-    int seed_row, seed_col;
-    seed_row = rand() % (pboard -> rows);
-    seed_col = rand() % (pboard -> cols);
+    int seed_row, seed_col, *sizes, \
+    nIslands, idLargestIsland, maxIslandSize, \
+    nrows, ncols;
+    bool foundWaterAdjacent;
+    cell *pc, *poc;
+    cellList *cList;
+    // Maximum island size is set to the size
+    // of the longest board edge - 1
+    nrows = (pboard -> rows);
+    ncols = (pboard -> cols);
+    maxIslandSize = MAX(nrows, ncols) - 2;
+    // Select a random seed cell
+    seed_row = rand() % nrows;
+    seed_col = rand() % ncols;
+    idLargestIsland = 0;
+    // Flood the board
     asignCell(pboard, seed_row, seed_col, WATER);
+    // Asign left over cells to land
     fillEmptyCells(pboard);
     markIslands(pboard);
-    printf("%d\n", findLargestIslandID(pboard));
+    // Check for island sizes
+    nIslands = countIslands(pboard);
+    sizes = getIslandSizes(pboard, nIslands);
+    for (int i = 0; i < nIslands; i++)
+    {
+        if (sizes[i] > sizes[idLargestIsland])
+        {
+            idLargestIsland = i;
+        }
+        
+    }
+    // Clear the largest island and re-flood
+    // if the largest island is too big
+    while (sizes[idLargestIsland] > maxIslandSize)
+    {
+        foundWaterAdjacent = false;
+        clearIsland(pboard, idLargestIsland);
+        unmarkIslands(pboard);
+        for (int i = 0; i < nrows; i++)
+        {
+            for (int j = 0; j < ncols; j++)
+            {
+                pc = &(pboard -> grid[i][j]);
+                if (((pc -> type) == EMPTY))
+                {
+                    cList = getOrthogonalCells(
+                        pboard, pc -> row, pc -> col);
+                    poc = popCellList(cList);
+                    while(poc != NULL)
+                    {
+                        if((poc -> type) == WATER && \
+                        isPoolSafe(pboard, pc -> row, pc -> col))
+                        {
+                            foundWaterAdjacent = true;
+                        }
+                        poc = popCellList(cList); 
+                    }
+                }
+                if(foundWaterAdjacent){break;}
+            }
+            if(foundWaterAdjacent){break;}
+        }
+        asignCell(pboard, pc -> row, pc -> col, WATER);
+        fillEmptyCells(pboard);
+        markIslands(pboard);
+        nIslands = countIslands(pboard);
+        sizes = getIslandSizes(pboard, nIslands);
+        for (int i = 0; i < nIslands; i++)
+        {
+            if (sizes[i] > sizes[idLargestIsland])
+            {
+                idLargestIsland = i;
+            }    
+        }
+    }
 }

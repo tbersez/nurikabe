@@ -5,7 +5,7 @@ typedef struct Cell
     cellType type;
     unsigned short row;
     unsigned short col;
-    unsigned short island;
+    short island;
 } cell;
 
 typedef struct CellNode
