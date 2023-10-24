@@ -6,6 +6,7 @@ typedef struct Cell
     unsigned short row;
     unsigned short col;
     short island;
+    short hint;
 } cell;
 
 typedef struct CellNode

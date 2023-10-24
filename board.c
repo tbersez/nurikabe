@@ -24,6 +24,7 @@ board *initBoard(int n_rows, int n_cols)
             emptyCell.row = i;
             emptyCell.col = j;
             emptyCell.island = -1; // -1 stands for no island
+            emptyCell.hint = 0;
             pboard -> grid[i][j] = emptyCell;
 
         }

@@ -241,6 +241,46 @@ void clearIsland(board *pboard, int islandId)
     }
 
 }
+
+// ----------------------- //
+// --- HINTS PLACEMENT --- //
+// ----------------------- //
+
+void placeHints(board *pboard, int *sizes, int nIslands)
+// Places hints randomly on islands
+{
+    int nrows, ncols, nCell, counter;
+    cell *pc;
+    bool placedHint;
+    nrows = pboard -> rows;
+    ncols = pboard -> cols;
+    for (int k = 0; k < nIslands; k++)
+    {
+        placedHint = false;
+        counter = 0;
+        nCell = rand() % sizes[k];
+        for (int i = 0; i < nrows; i++)
+        {
+           for (int j = 0; j < ncols; j++)
+           {
+                pc = &(pboard -> grid[i][j]);
+                if ((pc -> island) == k)
+                {
+                    if(counter == nCell){
+                        pc -> hint = sizes[k];
+                        placedHint = true;
+                    }
+                    counter++;
+                }
+                if(placedHint){break;}
+           }
+           if(placedHint){break;}
+        }
+    }
+    
+
+}
+
 // -----------------
 // --- GENERATOR ---
 // -----------------
@@ -323,4 +363,5 @@ void floodBoard(board *pboard)
             }    
         }
     }
+    placeHints(pboard, sizes, nIslands);
 }

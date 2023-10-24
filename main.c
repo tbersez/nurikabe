@@ -8,8 +8,8 @@
 // --- MAIN ---
 int main(){
     srand(time(NULL));
-    const int ROWS = 10;
-    const int COLS = 10;
+    const int ROWS = 20;
+    const int COLS = 20;
     board *pboard = initBoard(ROWS, COLS);
     floodBoard(pboard);
     printBoard(pboard);
