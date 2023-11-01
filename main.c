@@ -8,6 +8,7 @@ typedef enum PrgMode {GENERATE, SOLVE} prgMode;
 
 int main (int argc, char *argv[])
 {
+    srand(time(NULL));
     // CLI
     prgMode mode;
     int ROWS, COLS;
@@ -32,11 +33,10 @@ int main (int argc, char *argv[])
     {
         ROWS = atoi(argv[2]);
         COLS = atoi(argv[3]);
+        board *pboard = generator(ROWS, COLS);
+        printBoard(pboard);
+        writePuzzleToFile("test/puzzle.txt", pboard, false);
+        writePuzzleToFile("test/solution.txt", pboard, true);
     }
-    srand(time(NULL));
-    board *pboard = generator(ROWS, COLS);
-    printBoard(pboard);
-    writePuzzleToFile("test/puzzle.txt", pboard, false);
-    writePuzzleToFile("test/solution.txt", pboard, true);
     exit (0);
 }
