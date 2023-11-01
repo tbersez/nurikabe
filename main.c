@@ -36,5 +36,7 @@ int main (int argc, char *argv[])
     srand(time(NULL));
     board *pboard = generator(ROWS, COLS);
     printBoard(pboard);
+    writePuzzleToFile("test/puzzle.txt", pboard, false);
+    writePuzzleToFile("test/solution.txt", pboard, true);
     exit (0);
 }
