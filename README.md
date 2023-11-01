@@ -31,6 +31,8 @@ The generator picks a random cell from the board, sets it to `WATER` and recurse
 
 Once the algorithm explored all cells or got stuck, empty cells are affected to `LAND`. If the largest island is larger than the number of rows or columns of the board minus 1, it cell are set to `EMPTY` before re-calling the generator on an empty cell orthogonaly adjacent to a `WATER` cell.
 
+The hints are then asigned to a random cell of each island.
+
 ### Solver
 
 ## A bit of reading

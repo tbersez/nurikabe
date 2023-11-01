@@ -1,3 +1,6 @@
+#include <stdbool.h>
+#include <stdio.h>
+
 typedef enum CellType {EMPTY, LAND, WATER} cellType;
 
 typedef struct Cell
@@ -6,6 +9,7 @@ typedef struct Cell
     unsigned short row;
     unsigned short col;
     short island;
+    short hint;
 } cell;
 
 typedef struct CellNode
@@ -20,6 +24,7 @@ typedef struct CellList
 } cellList;
 
 void printCell(cell *c);
+void cellToFile(cell *c, FILE *fp, bool solved);
 void setCellStatus(cell *c, cellType type);
 cellList *initCellList();
 void printCellList(cellList *list);

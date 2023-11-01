@@ -241,13 +241,54 @@ void clearIsland(board *pboard, int islandId)
     }
 
 }
+
+// ----------------------- //
+// --- HINTS PLACEMENT --- //
+// ----------------------- //
+
+void placeHints(board *pboard, int *sizes, int nIslands)
+// Places hints randomly on islands
+{
+    int nrows, ncols, nCell, counter;
+    cell *pc;
+    bool placedHint;
+    nrows = pboard -> rows;
+    ncols = pboard -> cols;
+    for (int k = 0; k < nIslands; k++)
+    {
+        placedHint = false;
+        counter = 0;
+        nCell = rand() % sizes[k];
+        for (int i = 0; i < nrows; i++)
+        {
+           for (int j = 0; j < ncols; j++)
+           {
+                pc = &(pboard -> grid[i][j]);
+                if ((pc -> island) == k)
+                {
+                    if(counter == nCell){
+                        pc -> hint = sizes[k];
+                        placedHint = true;
+                    }
+                    counter++;
+                }
+                if(placedHint){break;}
+           }
+           if(placedHint){break;}
+        }
+    }
+    
+
+}
+
 // -----------------
 // --- GENERATOR ---
 // -----------------
 
 void floodBoard(board *pboard)
-// Board generator
+// Board flooding algorithm
 {   
+    int maxItter = 10;
     int seed_row, seed_col, *sizes, \
     nIslands, idLargestIsland, maxIslandSize, \
     nrows, ncols;
@@ -283,6 +324,7 @@ void floodBoard(board *pboard)
     // if the largest island is too big
     while (sizes[idLargestIsland] > maxIslandSize)
     {
+        maxItter--;
         foundWaterAdjacent = false;
         clearIsland(pboard, idLargestIsland);
         unmarkIslands(pboard);
@@ -322,5 +364,63 @@ void floodBoard(board *pboard)
                 idLargestIsland = i;
             }    
         }
+    }
+    placeHints(pboard, sizes, nIslands);
+    if (maxItter == 0)
+    {
+        // The algorithm should coverge in less that 10 itterations
+        maxItter = 10;
+        pboard = initBoard(nrows, ncols);
+        asignCell(pboard, seed_row, seed_col, WATER);
+    }
+    
+}
+
+board *generator(int row, int cols)
+// Board genertor
+{
+   board *pboard = initBoard(row, cols);
+   floodBoard(pboard);
+   return pboard;
+}
+
+// ----------
+// --- IO ---
+// ----------
+
+void writePuzzleToFile(char *filename, board *pboard, bool solved)
+// Writes puzzle to file.
+{
+    cell *pc;
+    int nrow = pboard -> rows;
+    int ncol = pboard -> cols;
+    FILE *fp = fopen(filename, "w");
+    if (fp == NULL)
+    {
+        printf("Error opening the file %s", filename);
+        exit (0);
+    }
+    fprintf(fp, "-");
+    for (size_t k = 0; k < nrow; k++)
+    {
+        fprintf(fp, "----");
+    }
+    fprintf(fp, "\n");
+    for (size_t i = 0; i < nrow; i++)
+    {
+        fprintf(fp, "|");
+        for (size_t j = 0; j < ncol; j++)
+        {
+            pc = &(pboard -> grid[i][j]);
+            cellToFile(pc, fp, solved);
+            fprintf(fp, "|");
+        }
+        fprintf(fp, "\n");
+        fprintf(fp, "-");
+        for (size_t k = 0; k < nrow; k++)
+        {
+            fprintf(fp, "----");
+        }
+        fprintf(fp, "\n");
     }
 }

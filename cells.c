@@ -1,6 +1,8 @@
 #include "cells.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <stdio.h>
 
 // -------------
 // --- CELLS ---
@@ -12,8 +14,49 @@ void printCell(cell *c)
     switch (c -> type)
     {
     case EMPTY: printf("\033[107m   \033[49m"); break;
-    case LAND: printf("\033[42m%3d\033[49m", c -> island); break;
+    case LAND: 
+        switch (c -> hint)
+        {
+        case 0:
+            printf("\033[42m   \033[49m");
+            break;
+        default:
+            printf("\033[42m%3d\033[49m", c -> hint);
+            break;
+        };
+        break;
     case WATER: printf("\033[104m   \033[49m"); break;
+    }
+}
+
+void cellToFile(cell *c, FILE *fp, bool solved)
+// Write hidden or solved cell to file
+{
+    if (solved)
+    {
+        if(c -> type == LAND)
+        {
+            if (c -> hint == 0)
+            {
+                fprintf(fp, " · ");
+            }
+            else
+            {
+                fprintf(fp, "%3d", c -> hint);
+            }
+            
+        } else {
+            fprintf(fp, " W ");
+        }
+    } else {
+        if (c -> hint == 0)
+            {
+                fprintf(fp, "   ");
+            }
+            else
+            {
+                fprintf(fp, "%3d", c -> hint);
+            }
     }
 }
 
