@@ -286,7 +286,7 @@ void placeHints(board *pboard, int *sizes, int nIslands)
 // -----------------
 
 void floodBoard(board *pboard)
-// Board generator
+// Board flooding algorithm
 {   
     int seed_row, seed_col, *sizes, \
     nIslands, idLargestIsland, maxIslandSize, \
@@ -364,4 +364,12 @@ void floodBoard(board *pboard)
         }
     }
     placeHints(pboard, sizes, nIslands);
+}
+
+board *generator(int row, int cols)
+// Board genertor
+{
+   board *pboard = initBoard(row, cols);
+   floodBoard(pboard);
+   return pboard;
 }
